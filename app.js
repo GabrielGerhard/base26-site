@@ -188,30 +188,81 @@ function podeEditarPagamento(u = usuarioLogado) {
 }
 
 // ── UPLOAD COM COMPRESSÃO E PROGRESSO ────────────────────────
-function comprimirImagem(file, maxPx = 1200, quality = 0.82) {
+function blobParaJpeg(canvas, quality) {
     return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+    });
+}
+
+function comprimirImagem(file, options = {}) {
+    const {
+        maxPx = 1000,
+        quality = 0.72,
+        minQuality = 0.45,
+        targetBytes = 450 * 1024
+    } = options;
+
+    return new Promise((resolve, reject) => {
         const img = new Image();
         const url = URL.createObjectURL(file);
-        img.onload = () => {
-            URL.revokeObjectURL(url);
-            let { width, height } = img;
 
-            if (width > maxPx || height > maxPx) {
-                if (width > height) {
-                    height = Math.round(height * maxPx / width);
-                    width = maxPx;
-                } else {
-                    width = Math.round(width * maxPx / height);
-                    height = maxPx;
+        img.onload = async () => {
+            try {
+                URL.revokeObjectURL(url);
+
+                let larguraMax = maxPx;
+                let qualidadeInicial = quality;
+
+                // Ajuste automático conforme tamanho original
+                if (file.size > 8 * 1024 * 1024) {
+                    larguraMax = 800;
+                    qualidadeInicial = 0.55;
+                } else if (file.size > 4 * 1024 * 1024) {
+                    larguraMax = 900;
+                    qualidadeInicial = 0.62;
+                } else if (file.size > 2 * 1024 * 1024) {
+                    larguraMax = 1000;
+                    qualidadeInicial = 0.68;
                 }
-            }
 
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-            canvas.toBlob(resolve, 'image/jpeg', quality);
+                let { width, height } = img;
+
+                if (width > larguraMax || height > larguraMax) {
+                    if (width > height) {
+                        height = Math.round(height * larguraMax / width);
+                        width = larguraMax;
+                    } else {
+                        width = Math.round(width * larguraMax / height);
+                        height = larguraMax;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d', { alpha: false });
+                ctx.drawImage(img, 0, 0, width, height);
+
+                let qualidadeAtual = qualidadeInicial;
+                let blob = await blobParaJpeg(canvas, qualidadeAtual);
+
+                while (blob && blob.size > targetBytes && qualidadeAtual > minQuality) {
+                    qualidadeAtual = Math.max(minQuality, qualidadeAtual - 0.07);
+                    blob = await blobParaJpeg(canvas, qualidadeAtual);
+                }
+
+                resolve(blob);
+            } catch (err) {
+                reject(err);
+            }
         };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('Não foi possível ler a imagem.'));
+        };
+
         img.src = url;
     });
 }
@@ -220,19 +271,32 @@ function uploadImagem(file, caminho, onProgress = null) {
     return new Promise(async (resolve, reject) => {
         try {
             const blob = await comprimirImagem(file);
+
+            if (!blob) {
+                reject(new Error('Falha ao comprimir a imagem.'));
+                return;
+            }
+
             const storageRef = ref(storage, caminho);
-            const task = uploadBytesResumable(storageRef, blob, { contentType: 'image/jpeg' });
+            const task = uploadBytesResumable(storageRef, blob, {
+                contentType: 'image/jpeg'
+            });
 
             task.on(
                 'state_changed',
                 (snapshot) => {
                     if (onProgress) {
-                        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                        const pct = Math.round(
+                            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                        );
                         onProgress(pct);
                     }
                 },
-                reject,
-                async () => resolve(await getDownloadURL(task.snapshot.ref))
+                (err) => reject(err),
+                async () => {
+                    const url = await getDownloadURL(task.snapshot.ref);
+                    resolve(url);
+                }
             );
         } catch (err) {
             reject(err);
