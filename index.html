@@ -86,16 +86,37 @@
 
             <div class="channel-list">
                 <p class="category-title">🏁 ASSOCIAÇÃO</p>
-                <button class="nav-btn active" data-target="garage-section" data-title="garagem"><span class="hash">#</span> garagem</button>
-                <button class="nav-btn" data-target="events-section" data-title="agenda-encontros"><span class="hash">#</span> agenda-encontros</button>
-                <button class="nav-btn" data-target="members-section" data-title="membros oficiais"><span class="hash">#</span> membros</button>
+                <button class="nav-btn active" data-target="garage-section" data-title="garagem">
+                    <span class="hash">#</span> garagem
+                </button>
+                <button class="nav-btn" data-target="about-section" data-title="sobre-a-base26">
+                    <span class="hash">#</span> sobre
+                </button>
+                <button class="nav-btn" data-target="events-section" data-title="agenda-encontros">
+                    <span class="hash">#</span> agenda-encontros
+                </button>
+                <button class="nav-btn" data-target="ranking-section" data-title="ranking-dos-carros">
+                    <span class="hash">#</span> ranking
+                </button>
+                <button class="nav-btn" data-target="members-section" data-title="membros-oficiais">
+                    <span class="hash">#</span> membros
+                </button>
+                <button class="nav-btn" data-target="payment-section" data-title="associacao-pagamento">
+                    <span class="hash">#</span> pagamento
+                </button>
 
                 <p class="category-title" style="margin-top: 20px;">💬 INTERAÇÃO</p>
-                <button class="nav-btn" data-target="chat-section" data-title="bate-papo"><span class="hash">#</span> bate-papo</button>
-                <button class="nav-btn" data-target="profile-section" data-title="meu-perfil"><span class="hash">#</span> meu-perfil</button>
+                <button class="nav-btn" data-target="chat-section" data-title="bate-papo">
+                    <span class="hash">#</span> bate-papo
+                </button>
+                <button class="nav-btn" data-target="profile-section" data-title="meu-perfil">
+                    <span class="hash">#</span> meu-perfil
+                </button>
 
                 <p class="category-title" id="admin-nav-title" style="margin-top: 20px; color: var(--yellow); display:none;">🛡️ DIRETORIA</p>
-                <button class="nav-btn hidden" id="admin-nav-btn" data-target="admin-section" data-title="painel-diretoria"><span class="hash">#</span> painel-diretoria</button>
+                <button class="nav-btn hidden" id="admin-nav-btn" data-target="admin-section" data-title="painel-diretoria">
+                    <span class="hash">#</span> painel-diretoria
+                </button>
             </div>
 
             <div class="user-panel">
@@ -122,8 +143,98 @@
 
                 <!-- GARAGEM -->
                 <section id="garage-section" class="app-section active-section">
-                    <p class="text-muted" style="margin-bottom: 20px;">Clique em um projeto para ver o perfil do proprietário.</p>
+                    <div class="alert-box" style="margin-bottom: 20px;">
+                        🚗 Explore os carros da Base26. Agora cada card poderá receber curtidas e alimentar o ranking oficial.
+                    </div>
+
+                    <div class="events-header-controls" style="justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                        <div>
+                            <h3 class="section-title" style="margin-bottom: 6px;">Garagem Oficial</h3>
+                            <p class="text-muted">Clique em um carro para ver o perfil do proprietário, fotos e detalhes.</p>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn-outline btn-small hidden" id="btn-refresh-garage">Atualizar</button>
+                        </div>
+                    </div>
+
                     <div id="cars-grid" class="cars-grid"></div>
+                </section>
+
+                <!-- SOBRE -->
+                <section id="about-section" class="app-section hidden">
+                    <div class="full-profile-card static-profile" style="max-width: 900px; width: 100%;">
+                        <div class="profile-banner" id="about-banner"></div>
+
+                        <div class="profile-content-area">
+                            <div class="profile-identity" style="margin-top: 0;">
+                                <h2>Base26</h2>
+                                <div class="badge-area">
+                                    <span class="badge admin-badge">🏁 Associação</span>
+                                    <span class="badge car-badge">📍 Comunidade Automotiva</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-about">
+                                <div id="about-admin-controls" class="admin-controls hidden">
+                                    <p class="admin-warning">⚙️ Apenas Diretoria+ pode editar esta área</p>
+                                    <button class="btn-outline btn-small" id="btn-edit-about">Editar Sobre</button>
+                                </div>
+
+                                <h3>Bordão</h3>
+                                <p id="about-slogan">Carregando bordão...</p>
+
+                                <h3 style="margin-top: 20px;">Biografia do Grupo</h3>
+                                <p id="about-bio">Carregando biografia...</p>
+
+                                <h3 style="margin-top: 20px;">Eventos já realizados</h3>
+
+                                <div id="historic-events-admin-controls" class="admin-controls hidden">
+                                    <p class="admin-warning">🗂️ Área de Eventos Realizados</p>
+                                    <button class="btn-outline btn-small" id="btn-new-historic-event">+ Adicionar Evento Realizado</button>
+                                </div>
+
+                                <div id="historic-events-list" class="events-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EVENTOS -->
+                <section id="events-section" class="app-section hidden">
+                    <div class="events-header-controls" style="justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                        <div>
+                            <h3 class="section-title" style="margin-bottom: 6px;">Agenda de Encontros</h3>
+                            <p class="text-muted">Próximos encontros, saídas e rolês oficiais da Base26.</p>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn-outline btn-small hidden" id="btn-view-historic-events">Ver Eventos Realizados</button>
+                            <button class="btn-primary btn-small hidden" id="btn-new-event">+ Criar Evento</button>
+                        </div>
+                    </div>
+
+                    <div id="events-list" class="events-list"></div>
+                </section>
+
+                <!-- RANKING -->
+                <section id="ranking-section" class="app-section hidden">
+                    <div class="alert-box" style="margin-bottom: 20px;">
+                        ❤️ O ranking é baseado na quantidade total de curtidas recebidas pelos carros dos membros.
+                    </div>
+
+                    <div class="events-header-controls" style="justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                        <div>
+                            <h3 class="section-title" style="margin-bottom: 6px;">Ranking dos Carros Mais Curtidos</h3>
+                            <p class="text-muted">Atualizado automaticamente conforme os membros curtem os carros da garagem.</p>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn-outline btn-small" id="btn-refresh-ranking">Atualizar Ranking</button>
+                        </div>
+                    </div>
+
+                    <div id="ranking-podium" class="cars-grid" style="margin-bottom: 25px;"></div>
+
+                    <h3 class="section-title">Classificação Completa</h3>
+                    <div id="ranking-list" class="admin-panel-list"></div>
                 </section>
 
                 <!-- MEMBROS -->
@@ -135,12 +246,41 @@
                     <ul id="member-list" class="detailed-user-list"></ul>
                 </section>
 
-                <!-- EVENTOS -->
-                <section id="events-section" class="app-section hidden">
-                    <div class="events-header-controls">
-                        <button class="btn-primary btn-small hidden" id="btn-new-event">+ Criar Evento</button>
+                <!-- PAGAMENTO -->
+                <section id="payment-section" class="app-section hidden">
+                    <div class="full-profile-card static-profile" style="max-width: 900px; width: 100%;">
+                        <div class="profile-content-area">
+                            <div class="profile-identity" style="margin-top: 0;">
+                                <h2>Associação Base26</h2>
+                                <div class="badge-area">
+                                    <span class="badge president-badge">💰 Contribuição</span>
+                                    <span class="badge car-badge">📌 PIX</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-about">
+                                <div id="payment-admin-controls" class="admin-controls hidden">
+                                    <p class="admin-warning">⚠️ Apenas Presidente e Criador podem editar esta área</p>
+                                    <button class="btn-outline btn-small" id="btn-edit-payment">Editar Pagamento</button>
+                                </div>
+
+                                <h3>Valor da Mensalidade</h3>
+                                <p id="association-price">R$ 20,00</p>
+
+                                <h3 style="margin-top: 20px;">Chave PIX</h3>
+                                <p id="association-pix-key">Carregando chave PIX...</p>
+
+                                <h3 style="margin-top: 20px;">QR Code</h3>
+                                <div id="payment-qrcode-wrapper" class="profile-car" style="justify-content:center; min-height: 220px;">
+                                    <img id="association-qrcode" src="" alt="QR Code PIX" style="width: 220px; height: 220px; object-fit: contain; display:none;">
+                                    <p id="association-qrcode-empty" class="text-muted">Nenhum QR Code cadastrado ainda.</p>
+                                </div>
+
+                                <h3 style="margin-top: 20px;">Aviso</h3>
+                                <p id="association-payment-note">Use esta área para contribuir com a associação e manter os projetos e encontros da Base26 ativos.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div id="events-list" class="events-list"></div>
                 </section>
 
                 <!-- CHAT -->
@@ -164,10 +304,12 @@
                             <div class="profile-avatar-container">
                                 <img id="my-avatar" src="" class="huge-avatar" alt="Meu Avatar">
                             </div>
+
                             <div class="profile-identity">
                                 <h2><span id="my-name">Nome</span> <span class="member-tag" id="my-id">#0000</span></h2>
                                 <div class="badge-area" id="my-badges"></div>
                             </div>
+
                             <div class="profile-about">
                                 <div class="admin-controls" style="border-color: var(--blue); background: rgba(37,99,235,0.1);">
                                     <p class="admin-warning" style="color: var(--blue);">⚙️ Área de Edição Pessoal</p>
@@ -175,10 +317,21 @@
                                     <button class="btn-outline btn-small" id="btn-add-photos">Adicionar Fotos do Carro</button>
                                     <input type="file" id="hidden-gallery-input" accept="image/*" multiple class="hidden">
                                 </div>
+
                                 <h3>Minha Bio</h3>
                                 <p id="my-bio"></p>
+
                                 <h3 style="margin-top: 15px;">Meu Veículo</h3>
                                 <div class="car-specs profile-car" id="my-car-card"></div>
+
+                                <div class="admin-controls" style="border-color: var(--green); background: rgba(35,165,89,0.12);">
+                                    <p class="admin-warning" style="color: var(--green);">❤️ Estatísticas do Meu Carro</p>
+                                    <div style="display:flex; gap:10px; flex-wrap:wrap; width:100%;">
+                                        <span class="badge car-badge">Curtidas recebidas: <strong id="my-car-likes">0</strong></span>
+                                        <span class="badge pending-badge">Posição no ranking: <strong id="my-car-ranking-position">--</strong></span>
+                                    </div>
+                                </div>
+
                                 <h3 style="margin-top: 20px;">📸 Minha Galeria</h3>
                                 <div class="insta-grid" id="my-insta-grid"></div>
                             </div>
@@ -191,10 +344,19 @@
                     <div class="alert-box" style="background: rgba(240, 178, 50, 0.1); border-color: var(--yellow); color: var(--yellow);">
                         ⚠️ Área Restrita: Gerenciamento de Membros e Diretoria. Modificações aqui afetam o sistema inteiro.
                     </div>
+
                     <div id="pending-users-section" class="hidden" style="margin-bottom: 30px;">
                         <h3 style="color: var(--yellow); margin-bottom: 15px;">🕐 Solicitações Pendentes</h3>
                         <div id="pending-users-list"></div>
                     </div>
+
+                    <div class="admin-controls hidden" id="association-admin-extra-controls">
+                        <p class="admin-warning">🧰 Ferramentas de Gestão da Associação</p>
+                        <button class="btn-outline btn-small" id="btn-admin-open-about-editor">Editar Sobre</button>
+                        <button class="btn-outline btn-small" id="btn-admin-open-payment-editor">Editar Pagamento</button>
+                        <button class="btn-outline btn-small" id="btn-admin-open-historic-editor">Novo Evento Realizado</button>
+                    </div>
+
                     <h3 style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 15px;">Membros Ativos</h3>
                     <div class="admin-panel-list" id="admin-users-list"></div>
                 </section>
@@ -212,25 +374,41 @@
     <div id="profile-modal" class="modal-overlay hidden">
         <div class="modal-content full-profile-card">
             <button class="close-modal-btn" id="close-modal">✖</button>
+
             <div class="profile-banner" id="modal-banner"></div>
+
             <div class="profile-content-area">
                 <div class="profile-avatar-container">
                     <img id="modal-avatar" src="" class="huge-avatar" alt="Avatar">
                 </div>
+
                 <div class="profile-identity">
                     <h2><span id="modal-name">Nome</span> <span class="member-tag" id="modal-id">#0000</span></h2>
                     <div class="badge-area" id="modal-badges"></div>
                 </div>
+
                 <div class="profile-about">
                     <div class="admin-controls hidden" id="modal-admin-controls">
                         <p class="admin-warning">⚠️ Modo Moderador</p>
-                        <button class="btn-outline btn-small red-outline">Moderar Bio</button>
-                        <button class="btn-outline btn-small red-outline">Remover Fotos</button>
+                        <button class="btn-outline btn-small red-outline" id="btn-modal-moderate-bio">Moderar Bio</button>
+                        <button class="btn-outline btn-small red-outline" id="btn-modal-remove-photos">Remover Fotos</button>
                     </div>
+
                     <h3>Bio</h3>
                     <p id="modal-bio"></p>
+
                     <h3 style="margin-top: 15px;">Veículo</h3>
                     <div class="car-specs profile-car" id="modal-car-card"></div>
+
+                    <div class="admin-controls" style="border-color: var(--green); background: rgba(35,165,89,0.12);">
+                        <p class="admin-warning" style="color: var(--green);">❤️ Curtidas do Carro</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; width:100%; align-items:center;">
+                            <span class="badge car-badge">Total de curtidas: <strong id="modal-car-likes">0</strong></span>
+                            <button class="btn-outline btn-small" id="btn-like-car">Curtir este carro</button>
+                            <button class="btn-outline btn-small hidden" id="btn-unlike-car">Remover curtida</button>
+                        </div>
+                    </div>
+
                     <h3 style="margin-top: 20px;">📸 Galeria</h3>
                     <div class="insta-grid" id="modal-insta-grid"></div>
                 </div>
@@ -238,23 +416,28 @@
         </div>
     </div>
 
-    <!-- Modal Evento -->
+    <!-- Modal Evento Agenda -->
     <div id="event-modal" class="modal-overlay hidden">
-        <div class="modal-content form-modal">
+        <div class="modal-content form-modal" style="max-height: 90vh; overflow-y: auto;">
             <button class="close-modal-btn" id="close-event-modal">✖</button>
+
             <h2 id="event-modal-title" style="margin-bottom: 20px; color: var(--white);">Agendar Encontro</h2>
+
             <div class="input-group">
                 <label>Nome do Evento</label>
                 <input type="text" id="event-nome" required placeholder="Ex: Encontro no Posto">
             </div>
+
             <div class="input-group">
                 <label>Data e Hora</label>
                 <input type="datetime-local" id="event-data" required>
             </div>
+
             <div class="input-group">
                 <label>Localização (Nome ou Link do Maps)</label>
                 <input type="text" id="event-local" required placeholder="Ex: Posto Ipiranga Centro">
             </div>
+
             <div class="input-group">
                 <label>Status</label>
                 <select id="event-status" required>
@@ -263,7 +446,137 @@
                     <option value="canceled">Cancelado</option>
                 </select>
             </div>
+
+            <div class="input-group">
+                <label>Descrição</label>
+                <textarea id="event-desc" rows="4" style="width:100%; padding:10px; background:var(--bg-base); color:var(--white); border:none; border-radius:4px; font-family:inherit;" placeholder="Descreva o evento, horário de saída, ponto de encontro e observações."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Imagem de Capa do Evento</label>
+                <input type="file" id="event-cover-image" accept="image/*" class="file-input">
+            </div>
+
             <button class="btn-primary" id="btn-save-event" style="margin-top: 10px;">Salvar Evento</button>
+        </div>
+    </div>
+
+    <!-- Modal Evento Realizado -->
+    <div id="historic-event-modal" class="modal-overlay hidden">
+        <div class="modal-content form-modal" style="max-height: 90vh; overflow-y: auto;">
+            <button class="close-modal-btn" id="close-historic-event-modal">✖</button>
+
+            <h2 id="historic-event-modal-title" style="margin-bottom: 20px; color: var(--white);">Adicionar Evento Realizado</h2>
+
+            <div class="input-group">
+                <label>Título do Evento</label>
+                <input type="text" id="historic-event-title" placeholder="Ex: Encontro da Serra - Abril 2026">
+            </div>
+
+            <div class="input-group">
+                <label>Data do Evento</label>
+                <input type="date" id="historic-event-date">
+            </div>
+
+            <div class="input-group">
+                <label>Descrição</label>
+                <textarea id="historic-event-description" rows="5" style="width:100%; padding:10px; background:var(--bg-base); color:var(--white); border:none; border-radius:4px; font-family:inherit;" placeholder="Conte como foi o evento, quantos carros participaram, destaques e curiosidades."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Imagem Principal do Card</label>
+                <input type="file" id="historic-event-cover" accept="image/*" class="file-input">
+            </div>
+
+            <div class="input-group">
+                <label>Galeria do Evento (máximo 5 imagens)</label>
+                <input type="file" id="historic-event-gallery" accept="image/*" multiple class="file-input">
+            </div>
+
+            <button class="btn-primary" id="btn-save-historic-event">Salvar Evento Realizado</button>
+        </div>
+    </div>
+
+    <!-- Modal Visualizar Evento Realizado -->
+    <div id="historic-event-view-modal" class="modal-overlay hidden">
+        <div class="modal-content full-profile-card" style="max-width: 900px;">
+            <button class="close-modal-btn" id="close-historic-event-view-modal">✖</button>
+
+            <div class="profile-banner" id="historic-view-banner"></div>
+
+            <div class="profile-content-area">
+                <div class="profile-identity" style="margin-top: 0;">
+                    <h2 id="historic-view-title">Título do Evento</h2>
+                    <div class="badge-area">
+                        <span class="badge car-badge" id="historic-view-date-badge">Data</span>
+                    </div>
+                </div>
+
+                <div class="profile-about">
+                    <h3>Descrição</h3>
+                    <p id="historic-view-description"></p>
+
+                    <h3 style="margin-top: 20px;">Galeria</h3>
+                    <div class="insta-grid" id="historic-view-gallery"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Sobre -->
+    <div id="about-modal" class="modal-overlay hidden">
+        <div class="modal-content form-modal" style="max-height: 90vh; overflow-y: auto;">
+            <button class="close-modal-btn" id="close-about-modal">✖</button>
+
+            <h2 style="margin-bottom: 20px; color: var(--white);">Editar Sobre a Base26</h2>
+
+            <div class="input-group">
+                <label>Bordão</label>
+                <input type="text" id="about-edit-slogan" placeholder="Ex: Baixos, estilo e respeito nas ruas.">
+            </div>
+
+            <div class="input-group">
+                <label>Biografia</label>
+                <textarea id="about-edit-bio" rows="6" style="width:100%; padding:10px; background:var(--bg-base); color:var(--white); border:none; border-radius:4px; font-family:inherit;" placeholder="Escreva a história da Base26, missão, trajetória e valores do grupo."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Imagem/Banner da seção Sobre</label>
+                <input type="file" id="about-edit-banner" accept="image/*" class="file-input">
+            </div>
+
+            <button class="btn-primary" id="btn-save-about">Salvar Sobre</button>
+        </div>
+    </div>
+
+    <!-- Modal Editar Pagamento -->
+    <div id="payment-modal" class="modal-overlay hidden">
+        <div class="modal-content form-modal" style="max-height: 90vh; overflow-y: auto;">
+            <button class="close-modal-btn" id="close-payment-modal">✖</button>
+
+            <h2 style="margin-bottom: 20px; color: var(--white);">Editar Pagamento da Associação</h2>
+
+            <div class="input-group">
+                <label>Valor Base</label>
+                <input type="number" id="payment-edit-price" min="0" step="0.01" placeholder="20.00">
+            </div>
+
+            <div class="input-group">
+                <label>Chave PIX</label>
+                <input type="text" id="payment-edit-pix-key" placeholder="Ex: base26@pix.com">
+            </div>
+
+            <div class="input-group">
+                <label>QR Code PIX (imagem)</label>
+                <input type="file" id="payment-edit-qrcode" accept="image/*" class="file-input">
+            </div>
+
+            <div class="input-group">
+                <label>Mensagem / Aviso</label>
+                <textarea id="payment-edit-note" rows="4" style="width:100%; padding:10px; background:var(--bg-base); color:var(--white); border:none; border-radius:4px; font-family:inherit;" placeholder="Ex: Ao pagar, envie o comprovante para a diretoria."></textarea>
+            </div>
+
+            <button class="btn-primary" id="btn-save-payment">Salvar Pagamento</button>
         </div>
     </div>
 
@@ -271,44 +584,56 @@
     <div id="edit-profile-modal" class="modal-overlay hidden">
         <div class="modal-content form-modal" style="max-height: 90vh; overflow-y: auto;">
             <button class="close-modal-btn" id="close-edit-profile">✖</button>
+
             <h2 style="margin-bottom: 20px; color: var(--white);">Configurações do Perfil</h2>
+
             <div id="edit-profile-form">
                 <h3 style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Pessoal</h3>
+
                 <div class="input-group">
                     <label>Nome de Exibição</label>
                     <input type="text" id="edit-nome" required>
                 </div>
+
                 <div class="input-group">
                     <label>Sua Biografia</label>
                     <textarea id="edit-bio" rows="3" style="width:100%; padding:10px; background:var(--bg-base); color:var(--white); border:none; border-radius:4px; font-family:inherit;"></textarea>
                 </div>
+
                 <div style="display:flex; gap:15px; margin-bottom:15px; flex-wrap: wrap;">
                     <div class="input-group" style="flex:1; min-width: 200px;">
                         <label>Mudar Foto de Perfil</label>
                         <input type="file" id="edit-avatar" accept="image/*" class="file-input">
                     </div>
+
                     <div class="input-group" style="flex:1; min-width: 200px;">
                         <label>Mudar Capa (Banner)</label>
                         <input type="file" id="edit-banner" accept="image/*" class="file-input">
                     </div>
                 </div>
+
                 <div class="input-group">
                     <label>Cor do seu Tema</label>
                     <input type="color" id="edit-color" style="width:100%; height:40px; cursor:pointer; background:none; border:none; padding:0;">
                 </div>
+
                 <h3 style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px; margin-top:20px;">Veículo</h3>
+
                 <div class="input-group">
                     <label>Modelo do Carro</label>
                     <input type="text" id="edit-car-modelo">
                 </div>
+
                 <div class="input-group">
                     <label>Especificações (Modificações)</label>
                     <input type="text" id="edit-car-specs">
                 </div>
+
                 <div class="input-group">
                     <label>Mudar Foto Principal do Carro</label>
                     <input type="file" id="edit-car-foto" accept="image/*" class="file-input">
                 </div>
+
                 <button class="btn-primary" id="btn-save-profile" style="margin-top: 15px;">Salvar Tudo</button>
             </div>
         </div>
