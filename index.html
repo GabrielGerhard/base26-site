@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base26 | Associação Automotiva</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ===== TELA DE LOGIN ===== -->
+    <main id="auth-section" class="container auth-container">
+        <div class="card" id="login-card">
+            <h1>BASE<span class="red-text">26</span></h1>
+            <p>Acesso exclusivo para membros.</p>
+
+            <div class="auth-error" id="login-error"></div>
+
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="login-email" required placeholder="seu@email.com">
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="login-password" required placeholder="••••••••">
+            </div>
+            <button class="btn-primary" id="btn-login">Entrar na Garagem</button>
+
+            <div class="auth-toggle">
+                Ainda não é membro? <a id="go-to-register">Solicitar acesso</a>
+            </div>
+        </div>
+
+        <!-- ===== TELA DE REGISTRO ===== -->
+        <div class="card hidden" id="register-card">
+            <h1>BASE<span class="red-text">26</span></h1>
+            <p>Solicitar entrada na associação.</p>
+
+            <div class="auth-error" id="register-error"></div>
+
+            <div class="input-group">
+                <label>Nome de Exibição</label>
+                <input type="text" id="reg-nome" required placeholder="Ex: João Silva">
+            </div>
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="reg-email" required placeholder="seu@email.com">
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="reg-password" required placeholder="Mín. 6 caracteres">
+            </div>
+            <div class="input-group">
+                <label>Modelo do Seu Carro</label>
+                <input type="text" id="reg-carro" required placeholder="Ex: Honda Civic EG6">
+            </div>
+
+            <button class="btn-primary" id="btn-register">Enviar Solicitação</button>
+
+            <div class="auth-toggle">
+                Já tem conta? <a id="go-to-login">Fazer login</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===== TELA: AGUARDANDO APROVAÇÃO ===== -->
+    <div id="pending-section" class="pending-screen hidden">
+        <div class="pending-card">
+            <div class="pending-icon">⏳</div>
+            <h2>Solicitação Enviada!</h2>
+            <p>Seu cadastro foi recebido e está aguardando aprovação da diretoria da Base26. Você receberá acesso assim que um admin liberar seu perfil.</p>
+            <p class="text-muted" style="font-size:0.8rem; margin-top: 10px;">Isso pode levar algumas horas.</p>
+            <button class="btn-outline btn-small" id="btn-pending-logout">Sair</button>
+        </div>
+    </div>
+
+    <!-- ===== APP PRINCIPAL ===== -->
+    <div id="app-container" class="hidden app-layout">
+        <div id="sidebar-overlay" class="overlay"></div>
+
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>BASE<span class="red-text">26</span></h2>
+                <button id="close-sidebar" class="btn-icon mobile-only">✖</button>
+            </div>
+
+            <div class="channel-list">
+                <p class="category-title">🏁 ASSOCIAÇÃO</p>
+                <button class="nav-btn active" data-target="garage-section" data-title="garagem"><span class="hash">#</span> garagem</button>
+                <button class="nav-btn" data-target="events-section" data-title="agenda-encontros"><span class="hash">#</span> agenda-encontros</button>
+                <button class="nav-btn" data-target="members-section" data-title="membros oficiais"><span class="hash">#</span> membros</button>
+
+                <p class="category-title" style="margin-top: 20px;">💬 INTERAÇÃO</p>
+                <button class="nav-btn" data-target="chat-section" data-title="bate-papo"><span class="hash">#</span> bate-papo</button>
+                <button class="nav-btn" data-target="profile-section" data-title="meu-perfil"><span class="hash">#</span> meu-perfil</button>
+
+                <p class="category-title" id="admin-nav-title" style="margin-top: 20px; color: var(--yellow); display:none;">🛡️ DIRETORIA</p>
+                <button class="nav-btn hidden" id="admin-nav-btn" data-target="admin-section" data-title="painel-diretoria"><span class="hash">#</span> painel-diretoria</button>
+            </div>
+
+            <div class="user-panel">
+                <div class="user-panel-info">
+                    <img id="sidebar-avatar" src="" class="avatar" alt="Avatar">
+                    <div class="details">
+                        <span class="name" id="sidebar-name">Usuário</span>
+                        <span class="status" id="sidebar-tag">#0000</span>
+                    </div>
+                </div>
+                <button id="btn-logout" class="btn-logout" title="Sair">⏻</button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="open-sidebar" class="btn-icon mobile-only">☰</button>
+                    <h3 id="current-page-title"><span class="hash">#</span> garagem</h3>
+                </div>
+            </header>
+
+            <div class="content-scrollable">
+
+                <!-- GARAGEM -->
+                <section id="garage-section" class="app-section active-section">
+                    <p class="text-muted" style="margin-bottom: 20px;">Clique em um projeto para ver o perfil do proprietário.</p>
+                    <div id="cars-grid" class="cars-grid"></div>
+                </section>
+
+                <!-- MEMBROS -->
+                <section id="members-section" class="app-section hidden">
+                    <p class="text-muted" style="margin-bottom: 20px;">Clique em um membro para visualizar o perfil completo.</p>
+                    <h3 class="section-title">Diretoria / Admins</h3>
+                    <ul id="admin-list" class="detailed-user-list"></ul>
+                    <h3 class="section-title" style="margin-top: 20px;">Membros Oficiais</h3>
+                    <ul id="member-list" class="detailed-user-list"></ul>
+                </section>
+
+                <!-- EVENTOS -->
+                <section id="events-section" class="app-section hidden">
+                    <div class="events-header-controls">
+                        <button class="btn-primary btn-small hidden" id="btn-new-event">+ Criar Evento</button>
+                    </div>
+                    <div id="events-list" class="events-list"></div>
+                </section>
+
+                <!-- CHAT -->
+                <section id="chat-section" class="app-section hidden chat-layout">
+                    <div id="chat-admin-controls" class="admin-controls hidden" style="margin: 15px 20px 0 20px; padding: 10px; border-color: var(--red); background: rgba(230,57,70,0.1);"></div>
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-input-wrapper">
+                        <div class="chat-input-box">
+                            <button class="icon-btn-chat emoji-btn">😀</button>
+                            <input type="text" placeholder="Conversar em #bate-papo" id="chat-input-field">
+                            <button class="icon-btn-chat send-btn" id="btn-send-msg">➤</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MEU PERFIL -->
+                <section id="profile-section" class="app-section hidden">
+                    <div class="full-profile-card static-profile">
+                        <div class="profile-banner" id="my-banner"></div>
+                        <div class="profile-content-area">
+                            <div class="profile-avatar-container">
+                                <img id="my-avatar" src="" class="huge-avatar" alt="Meu Avatar">
+                            </div>
+                            <div class="profile-identity">
+                                <h2><span id="my-name">Nome</span> <span class="member-tag" id="my-id">#0000</span></h2>
+                                <div class="badge-area" id="my-badges"></div>
+                            </div>
+                            <div class="profile-about">
+                                <div class="admin-controls" style="border-color: var(--blue); background: rgba(37,99,235,0.1);">
+                                    <p class="admin-warning" style="color: var(--blue);">⚙️ Área de Edição Pessoal</p>
+                                    <button class="btn-outline btn-small" id="btn-edit-profile">Editar Perfil</button>
+                                    <button class="btn-outline btn-small" id="btn-add-photos">Adicionar Fotos do Carro</button>
+                                    <input type="file" id="hidden-gallery-input" accept="image/*" multiple class="hidden">
+                                </div>
+                                <h3>Minha Bio</h3>
+                                <p id="my-bio"></p>
+                                <h3 style="margin-top: 15px;">Meu Veículo</h3>
+                                <div class="car-specs profile-car" id="my-car-card"></div>
+                                <h3 style="margin-top: 20px;">📸 Minha Galeria</h3>
+                                <div class="insta-grid" id="my-insta-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PAINEL ADMIN -->
+                <section id="admin-section" class="app-section hidden">
+                    <div class="alert-box" style="background: rgba(240, 178, 50, 0.1); border-color: var(--yellow); color: var(--yellow);">
+                        ⚠️ Área Restrita: Gerenciamento de Membros e Diretoria. Modificações aqui afetam o sistema inteiro.
+                    </div>
+                    <div id="pending-users-section" class="hidden" style="margin-bottom: 30px;">
+                        <h3 style="color: var(--yellow); margin-bottom: 15px;">🕐 Solicitações Pendentes</h3>
+                        <div id="pending-users-list"></div>
+                    </div>
+                    <h3 style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 15px;">Membros Ativos</h3>
+                    <div class="admin-panel-list" id="admin-users-list"></div>
+                </section>
+
+                <footer class="site-footer" id="site-footer">
+                    © 2026 Base26 - Associação Automotiva. Todos os direitos reservados.
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== MODAIS ===== -->
+
+    <!-- Modal Perfil -->
+    <div id="profile-modal" class="modal-overlay hidden">
+        <div class="modal-content full-profile-card">
+            <button class="close-modal-btn" id="close-modal">✖</button>
+            <div class="profile-banner" id="modal-banner"></div>
+            <div class="profile-content-area">
+                <div class="profile-avatar-container">
+                    <img id="modal-avatar" src="" class="huge-avatar" alt="Avatar">
+                </div>
+                <div class="profile-identity">
+                    <h2><span id="modal-name">Nome</span> <span class="member-tag" id="modal-id">#0000</span></h2>
+                    <div class="badge-area" id="modal-badges"></div>
+                </div>
+                <div class="profile-about">
+                    <div class="admin-controls hidden" id="modal-admin-controls">
+                        <p class="admin-warning">⚠️ Modo Moderador</p>
+                        <button class="btn-outline btn-small red-outline">Moderar Bio</button>
+                        <button class="btn-outline btn-small red-outline">Remover Fotos</button>
+                    </div>
+                    <h3>Bio</h3>
+                    <p id="modal-bio"></p>
+                    <h3 style="margin-top: 15px;">Veículo</h3>
+                    <div class="car-specs profile-car" id="modal-car-card"></div>
+                    <h3 style="margin-top: 20px;">📸 Galeria</h3>
+                    <div class="insta-grid" id="modal-insta-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Evento -->
+    <div id="event-modal" class="modal-overlay hidden">
+        <div class="modal-content form-modal">
+            <button class="close-modal-btn" id="close-event-modal">✖</button>
+            <h2 id="event-modal-title" style="margin-bottom: 20px; color: var(--white);">Agendar Encontro</h2>
+            <div class="input-group">
+                <label>Nome do Evento</label>
+                <input type="text" id="event-nome" required placeholder="Ex: Encontro no Posto">
+            </div>
+            <div class="input-group">
+                <label>Data e Hora</label>
+                <input type="datetime-local" id="event-data" required>
+            </div>
+            <div class="input-group">
+                <label>Localização (Nome ou Link do Maps)</label>
+                <input type="text" id="event-local" required placeholder="Ex: Posto Ipiranga Centro">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="event-status" required>
+                    <option value="active">Confirmado</option>
+                    <option value="done">Realizado</option>
+                    <option value="canceled">Cancelado</option>
+                </select>
+            </div>
+            <button class="btn-primary" id="btn-save-event" style="margin-top: 10px;">Salvar Evento</button>
+        </div>
+    </div>
+
+    <!-- Modal Editar Perfil -->
+    <div id="edit-profile-modal" class="modal-overlay hidden">
+        <div class="modal-content form-modal" style="max-height: 90vh; overflow-y: auto;">
+            <button class="close-modal-btn" id="close-edit-profile">✖</button>
+            <h2 style="margin-bottom: 20px; color: var(--white);">Configurações do Perfil</h2>
+            <div id="edit-profile-form">
+                <h3 style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Pessoal</h3>
+                <div class="input-group">
+                    <label>Nome de Exibição</label>
+                    <input type="text" id="edit-nome" required>
+                </div>
+                <div class="input-group">
+                    <label>Sua Biografia</label>
+                    <textarea id="edit-bio" rows="3" style="width:100%; padding:10px; background:var(--bg-base); color:var(--white); border:none; border-radius:4px; font-family:inherit;"></textarea>
+                </div>
+                <div style="display:flex; gap:15px; margin-bottom:15px; flex-wrap: wrap;">
+                    <div class="input-group" style="flex:1; min-width: 200px;">
+                        <label>Mudar Foto de Perfil</label>
+                        <input type="file" id="edit-avatar" accept="image/*" class="file-input">
+                    </div>
+                    <div class="input-group" style="flex:1; min-width: 200px;">
+                        <label>Mudar Capa (Banner)</label>
+                        <input type="file" id="edit-banner" accept="image/*" class="file-input">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Cor do seu Tema</label>
+                    <input type="color" id="edit-color" style="width:100%; height:40px; cursor:pointer; background:none; border:none; padding:0;">
+                </div>
+                <h3 style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px; margin-top:20px;">Veículo</h3>
+                <div class="input-group">
+                    <label>Modelo do Carro</label>
+                    <input type="text" id="edit-car-modelo">
+                </div>
+                <div class="input-group">
+                    <label>Especificações (Modificações)</label>
+                    <input type="text" id="edit-car-specs">
+                </div>
+                <div class="input-group">
+                    <label>Mudar Foto Principal do Carro</label>
+                    <input type="file" id="edit-car-foto" accept="image/*" class="file-input">
+                </div>
+                <button class="btn-primary" id="btn-save-profile" style="margin-top: 15px;">Salvar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
