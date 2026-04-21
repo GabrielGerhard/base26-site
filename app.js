@@ -194,12 +194,6 @@ function blobParaJpeg(canvas, quality) {
     });
 }
 
-function blobParaJpeg(canvas, quality) {
-    return new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
-    });
-}
-
 function comprimirImagem(file, options = {}) {
     const {
         maxPx = 1000,
