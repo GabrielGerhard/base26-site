@@ -194,6 +194,12 @@ function blobParaJpeg(canvas, quality) {
     });
 }
 
+function blobParaJpeg(canvas, quality) {
+    return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+    });
+}
+
 function comprimirImagem(file, options = {}) {
     const {
         maxPx = 1000,
@@ -213,16 +219,12 @@ function comprimirImagem(file, options = {}) {
                 let larguraMax = maxPx;
                 let qualidadeInicial = quality;
 
-                // Ajuste automático conforme tamanho original
                 if (file.size > 8 * 1024 * 1024) {
-                    larguraMax = 800;
-                    qualidadeInicial = 0.55;
+                    larguraMax = Math.min(larguraMax, 800);
+                    qualidadeInicial = Math.min(qualidadeInicial, 0.52);
                 } else if (file.size > 4 * 1024 * 1024) {
-                    larguraMax = 900;
-                    qualidadeInicial = 0.62;
-                } else if (file.size > 2 * 1024 * 1024) {
-                    larguraMax = 1000;
-                    qualidadeInicial = 0.68;
+                    larguraMax = Math.min(larguraMax, 900);
+                    qualidadeInicial = Math.min(qualidadeInicial, 0.58);
                 }
 
                 let { width, height } = img;
@@ -248,7 +250,7 @@ function comprimirImagem(file, options = {}) {
                 let blob = await blobParaJpeg(canvas, qualidadeAtual);
 
                 while (blob && blob.size > targetBytes && qualidadeAtual > minQuality) {
-                    qualidadeAtual = Math.max(minQuality, qualidadeAtual - 0.07);
+                    qualidadeAtual = Math.max(minQuality, qualidadeAtual - 0.06);
                     blob = await blobParaJpeg(canvas, qualidadeAtual);
                 }
 
@@ -266,11 +268,10 @@ function comprimirImagem(file, options = {}) {
         img.src = url;
     });
 }
-
-function uploadImagem(file, caminho, onProgress = null) {
+function uploadImagem(file, caminho, onProgress = null, options = {}) {
     return new Promise(async (resolve, reject) => {
         try {
-            const blob = await comprimirImagem(file);
+            const blob = await comprimirImagem(file, options);
 
             if (!blob) {
                 reject(new Error('Falha ao comprimir a imagem.'));
@@ -301,6 +302,14 @@ function uploadImagem(file, caminho, onProgress = null) {
         } catch (err) {
             reject(err);
         }
+    });
+}
+function uploadImagemBanner(file, caminho, onProgress = null) {
+    return uploadImagem(file, caminho, onProgress, {
+        maxPx: 900,
+        quality: 0.58,
+        minQuality: 0.38,
+        targetBytes: 180 * 1024
     });
 }
 
@@ -932,18 +941,20 @@ el('btn-save-profile')?.addEventListener('click', async () => {
         if (carroFile) arquivos.push({ file: carroFile, campo: 'carro.fotoThumb', caminho: `carros/${uid}/carro_${Date.now()}` });
 
         if (arquivos.length > 0) {
-            const progressos = new Array(arquivos.length).fill(0);
+    const progressos = new Array(arquivos.length).fill(0);
 
-            await Promise.all(arquivos.map(({ file, campo, caminho }, idx) =>
-                uploadImagem(file, caminho, (pct) => {
-                    progressos[idx] = pct;
-                    const total = Math.round(progressos.reduce((a, b) => a + b, 0) / arquivos.length);
-                    atualizarProgresso(total, `Enviando imagens... ${total}%`);
-                }).then((url) => {
-                    updates[campo] = url;
-                })
-            ));
-        }
+    await Promise.all(arquivos.map(({ file, campo, caminho }, idx) => {
+        const uploader = campo === 'bannerImg' ? uploadImagemBanner : uploadImagem;
+
+        return uploader(file, caminho, (pct) => {
+            progressos[idx] = pct;
+            const total = Math.round(progressos.reduce((a, b) => a + b, 0) / arquivos.length);
+            atualizarProgresso(total, `Enviando imagens... ${total}%`);
+        }).then((url) => {
+            updates[campo] = url;
+        });
+    }));
+}
 
         atualizarProgresso(100, 'Salvando dados...');
         await updateDoc(doc(db, 'usuarios', uid), updates);
@@ -1035,14 +1046,14 @@ el('btn-save-about')?.addEventListener('click', async () => {
         };
 
         const banner = el('about-edit-banner').files[0];
-        if (banner) {
-            const url = await uploadImagem(
-                banner,
-                `configuracoes/sobre/banner_${Date.now()}`,
-                (pct) => atualizarProgresso(pct, `Enviando banner... ${pct}%`)
-            );
-            updates.bannerImg = url;
-        }
+if (banner) {
+    const url = await uploadImagemBanner(
+        banner,
+        `configuracoes/sobre/banner_${Date.now()}`,
+        (pct) => atualizarProgresso(pct, `Enviando banner... ${pct}%`)
+    );
+    updates.bannerImg = url;
+}
 
         await setDoc(REF_SOBRE, updates, { merge: true });
         aboutModal.classList.add('hidden');
